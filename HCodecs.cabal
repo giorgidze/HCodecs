@@ -1,0 +1,34 @@
+name: HCodecs
+version: 0.2
+cabal-Version: >= 1.2
+license: BSD3
+license-file: LICENSE
+copyright: (c) 2007-2008 George Giorgidze
+author: George Giorgidze
+maintainer: George Giorgidze (GGG at CS dot NOTT dot AC dot UK)
+homepage: http://www.cs.nott.ac.uk/~ggg/
+category: Codec
+stability: experimental
+synopsis: A library to read, write and manipulate MIDI, WAVE, and SoundFont2 files.
+description:
+  The library provides functions to read, write and manipulate MIDI, WAVE and SoundFont2 multimedia files. It is written entirely in Haskell (without any FFI). It uses efficient  parsing and building combinators for binary data stored in ByteStrings (based on the one in 'binary' package).
+  .
+  Correctness of significant parts of the library has been validated with QuickCheck and Haskell Program Coverage (HPC) tool-kits.
+  .
+  HPC results can be seen at <http://www.cs.nott.ac.uk/~ggg/hpc/HCodecs/hpc_index.html>.
+build-type: Simple
+extra-source-files: src/Tests/Main.hs
+
+library
+  hs-source-dirs: src
+  ghc-options : -O3 -Wall
+  build-Depends: base < 5, bytestring, random, array, QuickCheck < 2
+  exposed-modules:
+    Codec.Midi
+    Codec.Wav
+    Codec.SoundFont
+    Data.Audio
+    Data.ByteString.Parser
+    Data.ByteString.Builder
+  other-modules:
+    Data.Arbitrary
