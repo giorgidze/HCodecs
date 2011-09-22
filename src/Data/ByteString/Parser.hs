@@ -110,10 +110,10 @@ import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString.Internal as B
 import qualified Data.ByteString.Lazy.Internal as L
 
-import Foreign
+import Foreign hiding (unsafePerformIO)
+import Control.Monad.ST.Unsafe (unsafeInterleaveST)
 
--- used by splitAtST
-import Control.Monad.ST
+import Control.Monad.ST hiding (unsafeInterleaveST)
 import Data.STRef
 
 
