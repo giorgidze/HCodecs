@@ -1,5 +1,5 @@
 name: HCodecs
-version: 0.2
+version: 0.2.1
 cabal-Version: >= 1.2
 license: BSD3
 license-file: LICENSE
