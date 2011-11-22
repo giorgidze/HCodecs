@@ -34,11 +34,14 @@ import Data.Char
 import Data.List
 import Data.Array.IArray
 
-import System.Random
-
 -- random since 1.0.1.0 defines the following instances
 #if MIN_VERSION_random(1,0,1)
+
+import System.Random ()
+
 #else
+
+import System.Random (RandomGen,Random,random,randomR)
 
 instance Random Word8 where
   randomR = integralRandomR
@@ -75,11 +78,11 @@ instance Random Word64 where
 instance Random Int64 where
   randomR = integralRandomR
   random = randomR (minBound,maxBound)
-#endif
 
 integralRandomR :: (Integral a, RandomGen g) => (a,a) -> g -> (a,g)
 integralRandomR  (a,b) g = case randomR (fromIntegral a :: Integer,fromIntegral b :: Integer) g of
                              (x1,g1) -> (fromIntegral x1, g1)
+#endif
 
 instance Arbitrary Word8 where
     arbitrary       = choose (minBound, maxBound)

@@ -13,6 +13,8 @@
 --
 -----------------------------------------------------------------------------
 
+{-# LANGUAGE CPP #-}
+
 module Data.ByteString.Parser (
 
     -- * The Parser type
@@ -111,11 +113,14 @@ import qualified Data.ByteString.Internal as B
 import qualified Data.ByteString.Lazy.Internal as L
 
 import Foreign hiding (unsafePerformIO)
-import Control.Monad.ST.Unsafe (unsafeInterleaveST)
 
+#if MIN_VERSION_base(4,4,0)
+import Control.Monad.ST.Unsafe (unsafeInterleaveST)
+#else
+import Control.Monad.ST        (unsafeInterleaveST)
+#endif
 import Control.Monad.ST hiding (unsafeInterleaveST)
 import Data.STRef
-
 
 -- | The parse state
 data S = S {-# UNPACK #-} !B.ByteString  -- current chunk
@@ -146,7 +151,7 @@ instance MonadPlus Parser where
     ok -> ok
 
 instance Applicative Parser where
-  pure = return
+  pure  = return
   (<*>) = ap
   
 instance Alternative Parser where
