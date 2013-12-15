@@ -65,7 +65,6 @@ instance Arbitrary SoundFont where
   arbitrary = do
     f1 <- arbitrary; f2 <- arbitrary; f3 <- arbitrary;
     return $! SoundFont f1 f2 f3
-  coarbitrary = undefined
 
 -- instance Show SoundFont where
 --   show sf = (show $ length $ elems $ sampleData sf) ++ "\n" ++ (show $ length $ show $ articulation sf) ++ "\n"
@@ -108,7 +107,6 @@ instance Arbitrary Info where
     where
     genStringNul :: Int -> Gen String 
     genStringNul l = sequence $ replicate l $ fmap w2c $ choose (1,255)
-  coarbitrary = undefined
 
 data Sdta = Sdta {
     smpl :: Audio.SampleData Int16
@@ -124,7 +122,6 @@ instance Arbitrary Sdta where
       , do sm24' <- arrayGen sn
            return $! Sdta smpl1 (Just sm24')
       ]
-  coarbitrary = undefined
 
 data Pdta = Pdta {
     phdrs :: Array Word Phdr
@@ -144,7 +141,6 @@ instance Arbitrary Pdta where
     f5 <- arbitrary; f6 <- arbitrary; f7 <- arbitrary; f8 <- arbitrary;
     f9 <- arbitrary;
     return $! Pdta f1 f2 f3 f4 f5 f6 f7 f8 f9
-  coarbitrary = undefined
 
 data Phdr = Phdr {
     presetName :: String
@@ -175,7 +171,6 @@ instance Arbitrary Phdr where
       , genre = fromIntegral $ genre'
       , morphology = fromIntegral $ morphology'
       }
-  coarbitrary = undefined
 
 data Bag = Bag {
     genNdx :: Word
@@ -189,7 +184,6 @@ instance Arbitrary Bag where
     return $! Bag {
         genNdx = fromIntegral genNdx'
       , modNdx = fromIntegral modNdx'}
-  coarbitrary = undefined
 
 data Mod = Mod {
     srcOper :: Word
@@ -213,7 +207,6 @@ instance Arbitrary Mod where
       , amtSrcOper = fromIntegral amtSrcOper'
       , transOper = fromIntegral transOper'
       }
-  coarbitrary = undefined
 
 data Generator =
   -- Oscillator
@@ -375,7 +368,6 @@ instance Arbitrary Generator where
       , RootKey w
     
       , ReservedGen i' i]
-  coarbitrary = undefined
 
 isSampleIndex :: Generator -> Bool
 isSampleIndex g = case g of
@@ -400,7 +392,6 @@ instance Arbitrary Inst where
     return $! Inst {
         instName = instName'
       , instBagNdx = fromIntegral $ instBagNdx'}
-  coarbitrary = undefined
 
 data Shdr = Shdr {
     sampleName :: String
@@ -440,7 +431,6 @@ instance Arbitrary Shdr where
       , sampleLink = fromIntegral sampleLink'
       , sampleType = fromIntegral sampleType'
       }
-  coarbitrary = undefined
 
 ---- SoundFont import
 

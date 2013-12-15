@@ -64,7 +64,7 @@ module Codec.Midi
 
 import Data.ByteString.Parser
 import Data.ByteString.Builder
-import Data.Arbitrary ()
+import Data.Arbitrary (two)
 
 import Data.Word
 import qualified Data.ByteString.Lazy as L
@@ -74,7 +74,7 @@ import Data.List
 import Data.Monoid
 import Control.Applicative
 import Control.Monad
-import Test.QuickCheck
+import Test.QuickCheck hiding ((.&.))
 
 
 data Midi = Midi {
@@ -96,14 +96,12 @@ instance Arbitrary Midi where
         return $! Midi ft td trks
     where
     fAux = (++ [(0,TrackEnd)]) . map (\(dt,m) -> (abs dt,m)) . removeTrackEnds 
-  coarbitrary = undefined
 
 data FileType = SingleTrack | MultiTrack | MultiPattern
   deriving (Eq, Show)
 
 instance Arbitrary FileType where
   arbitrary = oneof [return SingleTrack , return MultiTrack , return MultiPattern]
-  coarbitrary = undefined
   
 type Track a = [(a,Message)]
 
@@ -117,7 +115,6 @@ instance Arbitrary TimeDiv where
   arbitrary = oneof [
       choose (1,2 ^ (15 :: Int) - 1) >>= return . TicksPerBeat
     , two (choose (1,127)) >>= \(w1,w2) -> return $! TicksPerSecond w1 w2]
-  coarbitrary = undefined
 
 type Ticks = Int -- 0 - (2^28 - 1)
 type Time = Double
@@ -207,7 +204,6 @@ instance Arbitrary Message where
       , do w <- oneof [return 0xF0, return 0xF7]
            bs <- arbitrary
            return $! Sysex w bs]
-  coarbitrary = undefined
 
 isNoteOff :: Message -> Bool
 isNoteOff (NoteOff {}) = True

@@ -81,7 +81,6 @@ instance (Arbitrary a, IArray UArray a) => Arbitrary (Audio a) where
     sn <- choose (1, 1024) >>= return . (fromIntegral cn *)
     sd <- arrayGen sn
     return (Audio sr cn sd)
-  coarbitrary = undefined
 
 sampleNumber :: (IArray UArray a) => SampleData a -> Int
 sampleNumber sd = (snd (bounds sd)) + 1
@@ -147,4 +146,3 @@ data SampleMode = NoLoop | ContLoop | PressLoop deriving (Eq, Show)
 
 instance Arbitrary SampleMode where
   arbitrary = oneof [return NoLoop, return ContLoop, return PressLoop]
-  coarbitrary = undefined

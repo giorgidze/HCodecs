@@ -4,11 +4,12 @@ import Codec.Midi
 import qualified Codec.Wav as Wav
 import qualified Codec.SoundFont as SF
 import Data.Audio
+import Data.Arbitrary
 
 import Data.ByteString.Parser
 import Data.ByteString.Builder
 
-import Test.QuickCheck
+import Test.QuickCheck hiding ((.&.))
 import Data.Int
 import Data.Word
 import Data.Bits
@@ -20,6 +21,9 @@ import Control.Monad
 import Data.Monoid
 import Debug.Trace
 import System.FilePath
+
+test :: Testable prop => prop -> IO ()
+test = quickCheck
 
 roundTrip :: (Eq a, Show a) => (a -> Builder) -> Parser a -> a -> Bool
 roundTrip b p a = if Right a == ea'
