@@ -19,6 +19,7 @@
 module Data.Arbitrary (
     arrayGen
   , stringNulGen
+  , two
   ) where
 
 
@@ -28,11 +29,11 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as L
 
 import Data.Word
-import Data.Int
 import Data.Char
 
 import Data.List
 import Data.Array.IArray
+import Control.Monad (liftM2)
 
 -- random since 1.0.1.0 defines the following instances
 #if MIN_VERSION_random(1,0,1)
@@ -84,59 +85,22 @@ integralRandomR  (a,b) g = case randomR (fromIntegral a :: Integer,fromIntegral 
                              (x1,g1) -> (fromIntegral x1, g1)
 #endif
 
-instance Arbitrary Word8 where
-    arbitrary       = choose (minBound, maxBound)
-    coarbitrary     = undefined
-
-instance Arbitrary Word16 where
-    arbitrary       = choose (minBound, maxBound)
-    coarbitrary     = undefined
-
-instance Arbitrary Word32 where
-    arbitrary       = choose (minBound, maxBound)
-    coarbitrary     = undefined
-
-instance Arbitrary Word64 where
-    arbitrary       = choose (minBound, maxBound)
-    coarbitrary     = undefined
-
-instance Arbitrary Int8 where
-    arbitrary       = choose (minBound, maxBound)
-    coarbitrary     = undefined
-
-instance Arbitrary Int16 where
-    arbitrary       = choose (minBound, maxBound)
-    coarbitrary     = undefined
-
-instance Arbitrary Int32 where
-    arbitrary       = choose (minBound, maxBound)
-    coarbitrary     = undefined
-
-instance Arbitrary Int64 where
-    arbitrary       = choose (minBound, maxBound)
-    coarbitrary     = undefined
-
-instance Arbitrary Word where
-    arbitrary       = choose (minBound, maxBound)
-    coarbitrary     = undefined
-
-instance Arbitrary Char where
-    arbitrary = choose (0, 255) >>= return . toEnum
-    coarbitrary = undefined
-
 instance Arbitrary L.ByteString where
     arbitrary     = arbitrary >>= return . L.fromChunks . filter (not. B.null)
+
+instance CoArbitrary L.ByteString where
     coarbitrary s = coarbitrary (L.unpack s)
 
 instance Arbitrary B.ByteString where
   arbitrary = B.pack `fmap` arbitrary
+
+instance CoArbitrary B.ByteString where
   coarbitrary s = coarbitrary (B.unpack s)
   
 instance (Arbitrary e, Num i, IArray Array e, Ix i) =>  Arbitrary (Array i e) where
   arbitrary = do
     n <- choose (1, 128)
     arrayGen n
-  coarbitrary = undefined
 
 arrayGen :: (Arbitrary e, Num i, IArray a e, Ix i) => Word -> Gen (a i e)  
 arrayGen 0 = error "Array with 0 elements can not be defined"
@@ -147,3 +111,6 @@ arrayGen n = do
 stringNulGen :: Word -> Gen String
 stringNulGen n = do
   sequence $ genericReplicate n $ choose (1,255) >>= return . chr
+
+two :: Monad m => m a -> m (a, a)
+two m = liftM2 (,) m m
