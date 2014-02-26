@@ -8,7 +8,7 @@
 -- Stability   : Experimental
 -- Portability : Portable
 --
--- Reading, writing and maniplating of standard MIDI files
+-- Reading, writing and manipulating of standard MIDI files
 --
 -----------------------------------------------------------------------------
 

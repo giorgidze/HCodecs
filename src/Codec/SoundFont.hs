@@ -8,7 +8,7 @@
 -- Stability   : Experimental
 -- Portability : Portable
 --
--- Module for reading and writting of SoundFont instrument description files.
+-- Module for reading and writing of SoundFont instrument description files.
 --
 -----------------------------------------------------------------------------
 
