@@ -8,7 +8,7 @@
 -- Stability   : Experimental
 -- Portability : Portable
 --
--- Module for reading and writting of WAVE (.wav) audio files.
+-- Module for reading and writing of WAVE (.wav) audio files.
 --
 -----------------------------------------------------------------------------
 
