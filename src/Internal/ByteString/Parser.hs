@@ -15,7 +15,7 @@
 
 {-# LANGUAGE CPP #-}
 
-module Data.ByteString.Parser (
+module Internal.ByteString.Parser (
 
     -- * The Parser type
       Parser

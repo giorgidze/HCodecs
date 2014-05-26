@@ -62,9 +62,9 @@ module Codec.Midi
   )
    where
 
-import Data.ByteString.Parser
-import Data.ByteString.Builder
-import Data.Arbitrary ()
+import Internal.ByteString.Parser
+import Internal.ByteString.Builder
+import Internal.Arbitrary ()
 
 import Data.Word
 import qualified Data.ByteString.Lazy as L

@@ -1,12 +1,12 @@
-module Main where
+module Main (main) where
 
 import Codec.Midi
 import qualified Codec.Wav as Wav
 import qualified Codec.SoundFont as SF
 import Data.Audio
 
-import Data.ByteString.Parser
-import Data.ByteString.Builder
+import Internal.ByteString.Parser
+import Internal.ByteString.Builder
 
 import Test.QuickCheck
 import Data.Int
@@ -16,10 +16,8 @@ import Data.Bits
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as L
 
-import Control.Monad
 import Data.Monoid
 import Debug.Trace
-import System.FilePath
 
 roundTrip :: (Eq a, Show a) => (a -> Builder) -> Parser a -> a -> Bool
 roundTrip b p a = if Right a == ea'
@@ -61,74 +59,17 @@ testMidi =  do
                let (Midi SingleTrack _ trks) = toSingleTrack m
                in   length (concat $ tracks m) - length (concat trks) == length (tracks m) - 1
 
-  c <- readFile "mid.txt"
-  let midiFiles = lines c
-  sequence_ $ map f midiFiles
-  return ()
-  where
-  f n = do
-    putStr $ "Parsing " ++ n ++ " ... "
-    r <- importFile n
-    m <- case r of
-      Left e ->  fail $ "\n Failed: " ++ e ++ "\n"
-      Right m -> return m
-    putStrLn $ "OK"
-    putStr "Testing  ... "
-    when (not $ roundTrip buildMidi parseMidi m) $ fail "Failed\n"
-    putStrLn "OK"
-    exportFile ("./tmp/" ++ (takeBaseName n) ++ ".mid") m
-
 testWav :: IO ()
 testWav =  do
   putStrLn "TESTING PARSING AND BUILDING of Wav"
-
   test $ roundTrip (Wav.buildWav :: Audio Word8 -> Builder) Wav.parseWav
   test $ roundTrip (Wav.buildWav :: Audio Int16 -> Builder) Wav.parseWav
   test $ roundTrip (Wav.buildWav :: Audio Int32 -> Builder) Wav.parseWav
 
-  c <- readFile "wav.txt"
-  let wavFiles = lines c
-  sequence_ $ map f wavFiles
-  return ()
-  where
-  f n = do
-    putStr $ "Parsing " ++ n ++ " ... "
-    r <- Wav.importFile n
-    a <- case r of
-      Left e ->  fail $ "\n Failed: " ++ e ++ "\n"
-      Right a -> return $! (a :: Audio Int16)
-    putStrLn $ "OK"
-    putStr "Testing  ... "
-    when (not $ roundTrip Wav.buildWav Wav.parseWav a) $ fail "Failed\n"
-    let sd1 = (convert $ sampleData a) :: SampleData Word8
-    when (not $ roundTrip Wav.buildWav Wav.parseWav (a {sampleData = sd1})) $ fail "Failed\n"
-    let sd2 = (convert $ sampleData a) :: SampleData Int32
-    when (not $ roundTrip Wav.buildWav Wav.parseWav (a {sampleData = sd2})) $ fail "Failed\n"
-    putStrLn "OK"
-    Wav.exportFile ("./tmp/" ++ (takeBaseName n) ++ ".wav") a
-
 testSoundFont :: IO ()
 testSoundFont =  do
   putStrLn "TESTING PARSING AND BUILDING of SoundFont"
-
   test $ roundTrip SF.buildSoundFont SF.parseSoundFont
-
-  c <- readFile "sf2.txt"
-  let soundFontFiles = lines c
-  sequence_ $ map f soundFontFiles
-  return ()
-  where
-  f n = do
-    putStr $ "Parsing " ++ n ++ " ... "
-    r <- SF.importFile n
-    sf <- case r of
-      Left e ->  fail $ "\n Failed: " ++ e ++ "\n"
-      Right sf -> return sf
-    putStrLn $ "OK"
-    putStr "Testing  ... "
-    when (not $ roundTrip SF.buildSoundFont SF.parseSoundFont sf) $ fail "Failed\n"
-    putStrLn "OK"
-    SF.exportFile ("./tmp/" ++ (takeBaseName n) ++ ".sf2") sf
 
 testParserBuilder :: IO ()
 testParserBuilder = do

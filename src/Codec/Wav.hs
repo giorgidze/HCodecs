@@ -23,8 +23,8 @@ module Codec.Wav (
   ) where
 
 import Data.Audio
-import Data.ByteString.Parser
-import Data.ByteString.Builder
+import Internal.ByteString.Parser
+import Internal.ByteString.Builder
 
 import Data.Word
 import Data.Int

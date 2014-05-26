@@ -1,9 +1,9 @@
 name: HCodecs
-version: 0.2.2
-cabal-Version: >= 1.2
+version: 0.3
+cabal-Version: >= 1.8
 license: BSD3
 license-file: LICENSE
-copyright: (c) 2007-2011 George Giorgidze
+copyright: (c) 2007-2014 George Giorgidze
 author: George Giorgidze
 maintainer: George Giorgidze (giorgidze@gmail.com)
 homepage: http://www-db.informatik.uni-tuebingen.de/team/giorgidze
@@ -16,18 +16,27 @@ description:
   Correctness of significant parts of the library has been validated with QuickCheck and Haskell Program Coverage (HPC) tool-kits.
 
 build-type: Simple
-extra-source-files: src/Tests/Main.hs
+
+source-repository head
+  type:     git
+  location: https://github.com/giorgidze/HCodecs.git
 
 library
   hs-source-dirs: src
-  ghc-options : -O3 -Wall
-  build-Depends: base < 5, bytestring, random, array >= 0.4, QuickCheck < 2
+  ghc-options: -O3 -Wall
+  build-depends: base < 5, bytestring, random, array >= 0.4, QuickCheck < 2
   exposed-modules:
     Codec.Midi
     Codec.Wav
     Codec.SoundFont
     Data.Audio
-    Data.ByteString.Parser
-    Data.ByteString.Builder
   other-modules:
-    Data.Arbitrary
+    Internal.ByteString.Parser
+    Internal.ByteString.Builder
+
+test-suite tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: src
+  ghc-options: -O3 -Wall
+  build-depends: base < 5, bytestring, random, array >= 0.4, QuickCheck < 2
+  main-is: Internal/TestSuite.hs

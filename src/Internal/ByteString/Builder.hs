@@ -11,7 +11,7 @@
 -- Efficient construction of lazy bytestrings.
 --
 -----------------------------------------------------------------------------
-module Data.ByteString.Builder (
+module Internal.ByteString.Builder (
 
     -- * The Builder type
       Builder

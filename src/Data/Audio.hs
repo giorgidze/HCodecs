@@ -30,9 +30,9 @@ module Data.Audio (
  , fromSample
  ) where
 
-import Data.Arbitrary
-import Data.ByteString.Parser
-import Data.ByteString.Builder
+import Internal.Arbitrary
+import Internal.ByteString.Parser
+import Internal.ByteString.Builder
 
 import Test.QuickCheck
 

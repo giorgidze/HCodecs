@@ -16,7 +16,7 @@
 {-# LANGUAGE FlexibleContexts, CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Data.Arbitrary (
+module Internal.Arbitrary (
     arrayGen
   , stringNulGen
   ) where
