@@ -41,6 +41,7 @@ import Data.Int
 
 import Data.Array.Unboxed
 import Data.Array.IO
+import Data.Array.Unsafe
 
 import Data.Monoid
 
