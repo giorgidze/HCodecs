@@ -13,8 +13,6 @@
 --
 -----------------------------------------------------------------------------
 
-{-# LANGUAGE CPP #-}
-
 module Internal.ByteString.Parser (
 
     -- * The Parser type
