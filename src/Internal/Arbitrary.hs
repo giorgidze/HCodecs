@@ -3,7 +3,7 @@
 -- Module      : Data.Arbitrary
 -- Copyright   : George Giorgidze
 -- License     : BSD3
--- 
+--
 -- Maintainer  : George Giorgidze <http://cs.nott.ac.uk/~ggg/>
 -- Stability   : Experimental
 -- Portability : Portable
@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-{-# LANGUAGE FlexibleContexts, CPP #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Internal.Arbitrary (
@@ -34,55 +34,7 @@ import Data.Char
 import Data.List
 import Data.Array.IArray
 
--- random since 1.0.1.0 defines the following instances
-#if MIN_VERSION_random(1,0,1)
-
 import System.Random ()
-
-#else
-
-import System.Random (RandomGen,Random,random,randomR)
-
-instance Random Word8 where
-  randomR = integralRandomR
-  random = randomR (minBound,maxBound)
-
-instance Random Int8 where
-  randomR = integralRandomR
-  random = randomR (minBound,maxBound)
-
-instance Random Word16 where
-  randomR = integralRandomR
-  random = randomR (minBound,maxBound)
-
-instance Random Int16 where
-  randomR = integralRandomR
-  random = randomR (minBound,maxBound)
-
-instance Random Word where
-  randomR = integralRandomR
-  random = randomR (minBound,maxBound)
-
-instance Random Word32 where
-  randomR = integralRandomR
-  random = randomR (minBound,maxBound)
-
-instance Random Int32 where
-  randomR = integralRandomR
-  random = randomR (minBound,maxBound)
-
-instance Random Word64 where
-  randomR = integralRandomR
-  random = randomR (minBound,maxBound)
-
-instance Random Int64 where
-  randomR = integralRandomR
-  random = randomR (minBound,maxBound)
-
-integralRandomR :: (Integral a, RandomGen g) => (a,a) -> g -> (a,g)
-integralRandomR  (a,b) g = case randomR (fromIntegral a :: Integer,fromIntegral b :: Integer) g of
-                             (x1,g1) -> (fromIntegral x1, g1)
-#endif
 
 instance Arbitrary Word8 where
     arbitrary       = choose (minBound, maxBound)
@@ -138,9 +90,9 @@ instance (Arbitrary e, Num i, IArray Array e, Ix i) =>  Arbitrary (Array i e) wh
     arrayGen n
   coarbitrary = undefined
 
-arrayGen :: (Arbitrary e, Num i, IArray a e, Ix i) => Word -> Gen (a i e)  
+arrayGen :: (Arbitrary e, Num i, IArray a e, Ix i) => Word -> Gen (a i e)
 arrayGen 0 = error "Array with 0 elements can not be defined"
-arrayGen n = do 
+arrayGen n = do
   es <- vector (fromIntegral n)
   return $! listArray (0 , fromIntegral $ n - 1) es
   
