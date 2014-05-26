@@ -3,7 +3,7 @@
 -- Module      : Data.ByteString.Parser
 -- Copyright   : Lennart Kolmodin, George Giorgidze
 -- License     : BSD3
--- 
+--
 -- Maintainer  : George Giorgidze <http://cs.nott.ac.uk/~ggg/>
 -- Stability   : experimental
 -- Portability : Portable
@@ -56,16 +56,16 @@ module Data.ByteString.Parser (
     , getWord16be
     , word16be
     , getWord24be
-    , word24be    
+    , word24be
     , getWord32be
-    , word32be    
+    , word32be
     , getWord64be
     , word64be
 
     , getInt16be
     , int16be
     , getInt32be
-    , int32be    
+    , int32be
     , getInt64be
     , int64be
 
@@ -82,7 +82,7 @@ module Data.ByteString.Parser (
     , getInt16le
     , int16le
     , getInt32le
-    , int32le    
+    , int32le
     , getInt64le
     , int64le
 
@@ -112,14 +112,9 @@ import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString.Internal as B
 import qualified Data.ByteString.Lazy.Internal as L
 
-import Foreign hiding (unsafePerformIO)
-
-#if MIN_VERSION_base(4,4,0)
+import Foreign
+import Control.Monad.ST
 import Control.Monad.ST.Unsafe (unsafeInterleaveST)
-#else
-import Control.Monad.ST        (unsafeInterleaveST)
-#endif
-import Control.Monad.ST hiding (unsafeInterleaveST)
 import Data.STRef
 
 -- | The parse state
@@ -140,7 +135,7 @@ instance Monad Parser where
     m >>= k   = Parser $ \s -> case (unParser m) s of
       Left e -> Left e
       Right (a, s') -> (unParser (k a)) s'
-    fail  err  = Parser $ \(S _ _ bytes) -> 
+    fail  err  = Parser $ \(S _ _ bytes) ->
         Left (err ++ ". Failed reading at byte position " ++ show bytes)
 instance MonadPlus Parser where
   mzero = Parser $ \_ -> Left []
@@ -232,7 +227,7 @@ lookAheadE gea = do
 expect :: (Show a, Eq a) => (a -> Bool) -> Parser a -> Parser a
 expect f p = do
   v <- p
-  when (not $ f v) $ fail $ show v ++ " was not expected."   
+  when (not $ f v) $ fail $ show v ++ " was not expected."
   return v
 
 getString :: Int -> Parser String
@@ -327,7 +322,6 @@ getBytes n = do
                        when (B.length now < n) $ fail "too few bytes"
                        return now
 
-
 join :: B.ByteString -> L.ByteString -> L.ByteString
 join bb lb
     | B.null bb = lb
@@ -337,7 +331,7 @@ join bb lb
 -- second, this runs in constant heap space.
 --
 -- You must force the returned tuple for that to work, e.g.
--- 
+--
 -- > case splitAtST n xs of
 -- >    (ys,zs) -> consume ys ... consume zs
 --

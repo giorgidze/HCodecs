@@ -62,7 +62,7 @@ module Data.ByteString.Builder (
 
   ) where
 
-import Foreign hiding (unsafePerformIO)
+import Foreign
 import System.IO.Unsafe (unsafePerformIO)
 import Data.Monoid
 import qualified Data.ByteString      as S
