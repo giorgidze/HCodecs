@@ -103,7 +103,7 @@ module Data.ByteString.Parser (
     , varLenLe
   ) where
 
-import Control.Monad hiding (join)
+import Control.Monad
 import Control.Applicative
 import Data.Maybe (isNothing)
 
@@ -184,7 +184,7 @@ runParserState :: Parser a -> L.ByteString -> Int64 -> Either String (a, L.ByteS
 runParserState m str off =
     case unParser m (mkState str off) of
       Left e -> Left e
-      Right (a, ~(S s ss newOff)) -> Right (a, s `join` ss, newOff)
+      Right (a, ~(S s ss newOff)) -> Right (a, s `bsJoin` ss, newOff)
 
 ------------------------------------------------------------------------
 
@@ -279,7 +279,7 @@ getByteString n = readN n id
 getLazyByteString :: Int64 -> Parser L.ByteString
 getLazyByteString n = do
     S s ss bytes <- get
-    let big = s `join` ss
+    let big = s `bsJoin` ss
     case splitAtST n big of
       (consume, rest) -> do put $ mkState rest (bytes + n)
                             return consume
@@ -289,7 +289,7 @@ getLazyByteString n = do
 getLazyByteStringNul :: Parser L.ByteString
 getLazyByteStringNul = do
     S s ss bytes <- get
-    let big = s `join` ss
+    let big = s `bsJoin` ss
         (consume, t) = L.break (== 0) big
         (h, rest) = L.splitAt 1 t
     when (L.null h) $ fail "too few bytes"
@@ -300,7 +300,7 @@ getLazyByteStringNul = do
 getRemainingLazyByteString :: Parser L.ByteString
 getRemainingLazyByteString = do
     S s ss _ <- get
-    return $! (s `join` ss)
+    return $! (s `bsJoin` ss)
 
 ------------------------------------------------------------------------
 -- Helpers
@@ -314,7 +314,7 @@ getBytes n = do
                 put $! S rest ss (bytes + fromIntegral n)
                 return $! consume
         else
-              case L.splitAt (fromIntegral n) (s `join` ss) of
+              case L.splitAt (fromIntegral n) (s `bsJoin` ss) of
                 (consuming, rest) ->
                     do let now = B.concat . L.toChunks $ consuming
                        put $! mkState rest (bytes + fromIntegral n)
@@ -322,8 +322,8 @@ getBytes n = do
                        when (B.length now < n) $ fail "too few bytes"
                        return now
 
-join :: B.ByteString -> L.ByteString -> L.ByteString
-join bb lb
+bsJoin :: B.ByteString -> L.ByteString -> L.ByteString
+bsJoin bb lb
     | B.null bb = lb
     | otherwise = L.Chunk bb lb
 
