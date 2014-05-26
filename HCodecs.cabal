@@ -33,6 +33,7 @@ library
   other-modules:
     Internal.ByteString.Parser
     Internal.ByteString.Builder
+    Internal.Arbitrary
 
 test-suite tests
   type: exitcode-stdio-1.0
