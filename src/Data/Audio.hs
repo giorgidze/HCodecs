@@ -30,23 +30,19 @@ module Data.Audio (
  , fromSample
  ) where
 
+import Data.Array.IO     (MArray, IOUArray, newArray_, writeArray)
+import Data.Array.Unsafe (unsafeFreeze, unsafeThaw)
+
 import Internal.Arbitrary
 import Internal.ByteString.Parser
 import Internal.ByteString.Builder
 
 import Test.QuickCheck
-
+import System.IO.Unsafe
+import Data.Array.Unboxed
 import Data.Word
 import Data.Int
-
-import Data.Array.Unboxed
-import Data.Array.IO
-import Data.Array.Unsafe
-
 import Data.Monoid
-
-import System.IO.Unsafe
-
 
 type Sample = Double
 type SampleData a = UArray Int a
