@@ -3,7 +3,7 @@
 -- Module      : Data.ByteString.Builder
 -- Copyright   : Lennart Kolmodin, Ross Paterson, George Giorgidze
 -- License     : BSD3
--- 
+--
 -- Maintainer  : George Giorgidze <http://cs.nott.ac.uk/~ggg/>
 -- Stability   : experimental
 -- Portability : Portable
@@ -62,15 +62,21 @@ module Internal.ByteString.Builder (
 
   ) where
 
-import Foreign
-import System.IO.Unsafe (unsafePerformIO)
-import Data.Monoid
-import qualified Data.ByteString      as S
-import qualified Data.ByteString.Lazy as L
 
-import Data.ByteString.Internal (inlinePerformIO,c2w)
 import qualified Data.ByteString.Internal as S
+import qualified Data.ByteString          as S
+import qualified Data.ByteString.Lazy     as L
 
+import Foreign.Storable         (Storable, poke, sizeOf)
+import Foreign.Ptr              (Ptr, plusPtr)
+import Foreign.ForeignPtr       (ForeignPtr, withForeignPtr)
+import System.IO.Unsafe         (unsafePerformIO)
+import Data.ByteString.Internal (inlinePerformIO,c2w)
+
+import Data.Bits
+import Data.Word
+import Data.Int
+import Data.Monoid
 
 ------------------------------------------------------------------------
 
