@@ -101,19 +101,24 @@ module Internal.ByteString.Parser (
     , varLenLe
   ) where
 
-import Control.Monad
-import Control.Applicative
-import Data.Maybe (isNothing)
-
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as L
-import qualified Data.ByteString.Internal as B
+import qualified Data.ByteString               as B
+import qualified Data.ByteString.Lazy          as L
+import qualified Data.ByteString.Internal      as B
 import qualified Data.ByteString.Lazy.Internal as L
 
-import Foreign
-import Control.Monad.ST
+import Foreign.Storable        (Storable, peek, sizeOf)
+import Foreign.Ptr             (plusPtr, castPtr)
+import Foreign.ForeignPtr      (withForeignPtr)
+import Control.Monad.ST        (runST)
 import Control.Monad.ST.Unsafe (unsafeInterleaveST)
+
+import Control.Monad
+import Control.Applicative
 import Data.STRef
+import Data.Word
+import Data.Int
+import Data.Bits
+import Data.Maybe
 
 -- | The parse state
 data S = S {-# UNPACK #-} !B.ByteString  -- current chunk
