@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Internal.ByteString.Parser (
+module Codec.ByteString.Parser (
 
     -- * The Parser type
       Parser

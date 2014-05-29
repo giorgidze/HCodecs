@@ -16,7 +16,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Internal.Arbitrary (
+module Codec.Internal.Arbitrary (
     arrayGen
   , stringNulGen
   ) where

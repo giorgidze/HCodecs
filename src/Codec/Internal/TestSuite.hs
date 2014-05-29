@@ -5,8 +5,8 @@ import qualified Codec.Wav as Wav
 import qualified Codec.SoundFont as SF
 import Data.Audio
 
-import Internal.ByteString.Parser
-import Internal.ByteString.Builder
+import Codec.ByteString.Parser
+import Codec.ByteString.Builder
 
 import Test.QuickCheck
 import Data.Int

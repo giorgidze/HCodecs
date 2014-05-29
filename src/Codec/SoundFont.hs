@@ -37,9 +37,9 @@ module Codec.SoundFont (
   , buildPdta
   )  where
 
-import Internal.ByteString.Parser
-import Internal.ByteString.Builder
-import Internal.Arbitrary
+import Codec.ByteString.Parser
+import Codec.ByteString.Builder
+import Codec.Internal.Arbitrary
 import qualified Data.Audio as Audio
 
 import Data.Word

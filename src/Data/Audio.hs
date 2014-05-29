@@ -33,9 +33,9 @@ module Data.Audio (
 import Data.Array.IO     (MArray, IOUArray, newArray_, writeArray)
 import Data.Array.Unsafe (unsafeFreeze, unsafeThaw)
 
-import Internal.Arbitrary
-import Internal.ByteString.Parser
-import Internal.ByteString.Builder
+import Codec.Internal.Arbitrary
+import Codec.ByteString.Parser
+import Codec.ByteString.Builder
 
 import Test.QuickCheck
 import System.IO.Unsafe
