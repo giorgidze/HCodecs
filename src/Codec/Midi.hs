@@ -3,7 +3,7 @@
 -- Module      : Codec.Midi
 -- Copyright   : George Giorgidze
 -- License     : BSD3
--- 
+--
 -- Maintainer  : George Giorgidze <http://cs.nott.ac.uk/~ggg/>
 -- Stability   : Experimental
 -- Portability : Portable
@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Codec.Midi 
+module Codec.Midi
   (
     Midi (..)
   , FileType (..)
@@ -29,7 +29,7 @@ module Codec.Midi
   , Preset
   , Bank
   , PitchWheel
-  , Tempo 
+  , Tempo
   
   , isNoteOff
   , isNoteOn
@@ -62,20 +62,21 @@ module Codec.Midi
   )
    where
 
+import qualified Data.ByteString.Lazy as L
+
+import Test.QuickCheck (Arbitrary, arbitrary, choose, oneof)
+
 import Codec.ByteString.Parser
 import Codec.ByteString.Builder
 import Codec.Internal.Arbitrary ()
 
 import Data.Word
-import qualified Data.ByteString.Lazy as L
 import Data.Bits
 import Data.Maybe
 import Data.List
 import Data.Monoid
 import Control.Applicative
 import Control.Monad
-import Test.QuickCheck
-
 
 data Midi = Midi {
     fileType :: FileType
@@ -95,15 +96,13 @@ instance Arbitrary Midi where
         trks <- arbitrary >>= return . map fAux
         return $! Midi ft td trks
     where
-    fAux = (++ [(0,TrackEnd)]) . map (\(dt,m) -> (abs dt,m)) . removeTrackEnds 
-  coarbitrary = undefined
+    fAux = (++ [(0,TrackEnd)]) . map (\(dt,m) -> (abs dt,m)) . removeTrackEnds
 
 data FileType = SingleTrack | MultiTrack | MultiPattern
   deriving (Eq, Show)
 
 instance Arbitrary FileType where
   arbitrary = oneof [return SingleTrack , return MultiTrack , return MultiPattern]
-  coarbitrary = undefined
   
 type Track a = [(a,Message)]
 
@@ -117,7 +116,6 @@ instance Arbitrary TimeDiv where
   arbitrary = oneof [
       choose (1,2 ^ (15 :: Int) - 1) >>= return . TicksPerBeat
     , two (choose (1,127)) >>= \(w1,w2) -> return $! TicksPerSecond w1 w2]
-  coarbitrary = undefined
 
 type Ticks = Int -- 0 - (2^28 - 1)
 type Time = Double
@@ -129,7 +127,7 @@ type Pressure = Int -- 0 - 127
 type Preset = Int	-- 0 - 127
 type Bank = Int
 type PitchWheel = Int	-- 0 - (2^14 - 1)
-type Tempo = Int -- microseconds per beat  1 - (2^24 - 1) 
+type Tempo = Int -- microseconds per beat  1 - (2^24 - 1)
 
 data Message =
 -- Channel Messages
@@ -141,7 +139,7 @@ data Message =
   ChannelPressure { channel :: !Channel, pressure :: !Pressure } |
   PitchWheel      { channel :: !Channel, pitchWheel :: !PitchWheel } |
 -- Meta Messages
-  SequenceNumber !Int | -- 0 - (2^16 - 1) 
+  SequenceNumber !Int | -- 0 - (2^16 - 1)
   Text !String |
   Copyright !String |
   TrackName !String |
@@ -172,7 +170,7 @@ instance Arbitrary Message where
       , two (choose (0,127))  >>= \(w2,w3) -> return $! KeyPressure c w2 w3
       , two (choose (0,127))  >>= \(w2,w3) -> return $! ControlChange c w2 w3
       , choose (0,127)        >>= \w2      -> return $! ProgramChange c w2
-      , choose (0,127)        >>= \w2      -> return $! ChannelPressure c w2 
+      , choose (0,127)        >>= \w2      -> return $! ChannelPressure c w2
       , do p <- choose (0,2 ^ (14 :: Int) - 1)
            return $! PitchWheel c p
       -- Meta Messages
@@ -207,7 +205,6 @@ instance Arbitrary Message where
       , do w <- oneof [return 0xF0, return 0xF7]
            bs <- arbitrary
            return $! Sysex w bs]
-  coarbitrary = undefined
 
 isNoteOff :: Message -> Bool
 isNoteOff (NoteOff {}) = True
@@ -295,19 +292,19 @@ toAbsTime :: (Num a) => Track a -> Track a
 toAbsTime trk = zip ts' ms
   where
   (ts,ms) = unzip trk
-  (_,ts') = mapAccumL (\acc t -> let t' = acc + t in (t',t')) 0 ts 
+  (_,ts') = mapAccumL (\acc t -> let t' = acc + t in (t',t')) 0 ts
   
 fromAbsTime :: (Num a) => Track a -> Track a
-fromAbsTime trk = zip ts' ms 
+fromAbsTime trk = zip ts' ms
   where
   (ts,ms) = unzip trk
-  (_,ts') = mapAccumL (\acc t -> (t,t - acc)) 0 ts 
+  (_,ts') = mapAccumL (\acc t -> (t,t - acc)) 0 ts
 
 toRealTime :: TimeDiv -> Track Ticks -> Track Time
 toRealTime (TicksPerBeat tpb) trk = trk'
   where
   (_,trk') = mapAccumL f (div 60000000 120) trk -- default tempo 120 beats per minute
-  formula dt tempo = 
+  formula dt tempo =
     (fromIntegral dt / fromIntegral tpb) * (fromIntegral tempo) * (1.0E-6)
   f :: Tempo -> (Ticks,Message) -> (Tempo, (Time,Message))
   f _ (dt, TempoChange tempo) = (tempo, (formula dt tempo, TempoChange tempo))
@@ -320,7 +317,7 @@ fromRealTime :: TimeDiv -> Track Time -> Track Ticks
 fromRealTime (TicksPerBeat tpb) trk = trk'
   where
   (_,trk') = mapAccumL f (div 60000000 120) trk -- default tempo 120 beats per minute
-  formula dt tempo = round $ 
+  formula dt tempo = round $
     (dt * fromIntegral tpb) / (fromIntegral tempo * 1.0E-6)
   f :: Tempo -> (Time,Message) -> (Tempo, (Ticks,Message))
   f _ (dt, TempoChange tempo) = (tempo, (formula dt tempo, TempoChange tempo))
@@ -329,7 +326,7 @@ fromRealTime (TicksPerSecond fps tpf) trk = map f trk
   where
   f (dt,msg) = (round $ dt * fromIntegral fps * fromIntegral tpf, msg)
 
--- MIDI import 
+-- MIDI import
 importFile :: FilePath -> IO (Either String Midi)
 importFile f = do
   bs <- L.readFile f
@@ -338,7 +335,7 @@ importFile f = do
 exportFile :: FilePath -> Midi ->  IO ()
 exportFile f m = do
   let bs = toLazyByteString $ buildMidi m
-  L.writeFile f bs 
+  L.writeFile f bs
 
 -- All numeric values are stored in big-endian format
 
@@ -371,7 +368,7 @@ buildMidi m = mconcat [
     putString "MThd"
   , putWord32be 6
   , case fileType m of
-      SingleTrack -> putWord16be 0 
+      SingleTrack -> putWord16be 0
       MultiTrack -> putWord16be 1
       MultiPattern -> putWord16be 2
   , putWord16be (fromIntegral $ length $ tracks m)
@@ -385,7 +382,7 @@ buildMidi m = mconcat [
 parseTrack :: Parser (Track Ticks)
 parseTrack = do
   _ <- string "MTrk"
-  _ <- getWord32be -- trackSize 
+  _ <- getWord32be -- trackSize
   track' <- parseMessages Nothing
   return track'
  
@@ -395,12 +392,12 @@ buildTrack trk = mconcat [
   , putWord32be $ fromIntegral $ L.length bs
   , fromLazyByteString bs]
   where
-  f (dt,msg) = (putVarLenBe $ fromIntegral dt) `append` buildMessage msg 
+  f (dt,msg) = (putVarLenBe $ fromIntegral dt) `append` buildMessage msg
   bs = toLazyByteString $ mconcat (map f trk)
 
 parseMessages :: Maybe Message -> Parser (Track Ticks)
 parseMessages mPreMsg = do
-  dt <- getVarLenBe >>= return . fromIntegral 
+  dt <- getVarLenBe >>= return . fromIntegral
   msg <- parseMessage mPreMsg
   if (isTrackEnd msg)
     then return [(dt,msg)]
@@ -539,7 +536,7 @@ buildMetaMessage msg = putWord8 0xFF `mappend`
   case msg of
     SequenceNumber i -> mconcat
       [putWord8 0x00, putVarLenBe 2, putWord16be $ fromIntegral $ i]
-    Text s -> mconcat 
+    Text s -> mconcat
       [putWord8 0x01, putVarLenBe (fromIntegral $ length s), putString s]
     Copyright s -> mconcat
       [putWord8 0x02, putVarLenBe (fromIntegral $ length s), putString s]
@@ -579,7 +576,7 @@ buildMetaMessage msg = putWord8 0xFF `mappend`
         putWord8 (fromIntegral w)
       , putVarLenBe (fromIntegral $ L.length bs)
       , fromLazyByteString bs]
-    _ -> mempty  
+    _ -> mempty
 
 parseSequenceNumber :: Parser Message
 parseSequenceNumber = do
@@ -675,7 +672,7 @@ parseSMPTEOffset :: Parser Message
 parseSMPTEOffset = do
   _ <- word8 0x54
   _ <- varLenBe 5
-  bs <- getLazyByteString 5 
+  bs <- getLazyByteString 5
   let [n1,n2,n3,n4,n5] = map fromIntegral (L.unpack bs)
   return $! SMPTEOffset n1 n2 n3 n4 n5
 
@@ -715,3 +712,6 @@ buildSysexMessage (Sysex i bs) =
           , putVarLenBe $ fromIntegral $ L.length bs
           , fromLazyByteString bs]
 buildSysexMessage _ = mempty
+
+two :: Applicative f => f a -> f (a,a)
+two a = pure ((,)) <*> a <*> a
