@@ -76,7 +76,8 @@ import Data.ByteString.Internal (inlinePerformIO,c2w)
 import Data.Bits
 import Data.Word
 import Data.Int
-import Data.Monoid
+import Data.Monoid hiding ((<>))
+import Data.Semigroup
 
 ------------------------------------------------------------------------
 
@@ -96,9 +97,12 @@ newtype Builder = Builder {
         runBuilder :: (Buffer -> [S.ByteString]) -> Buffer -> [S.ByteString]
     }
 
+instance Semigroup Builder where
+    (<>) = append
+
 instance Monoid Builder where
     mempty  = empty
-    mappend = append
+    mappend = (<>)
 
 ------------------------------------------------------------------------
 
